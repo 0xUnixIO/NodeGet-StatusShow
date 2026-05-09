@@ -1,0 +1,342 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+}
+
+@layer base {
+  /* =====================================================
+     浅色主题（默认）：蓝灰 Slate 风格
+     ===================================================== */
+  :root {
+    /* shadcn 基础 token */
+    --background: 220 17% 95%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 16% 90%;
+    --secondary-foreground: 222 47% 20%;
+    --muted: 220 16% 90%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 220 16% 88%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 16% 88%;
+    --input: 220 16% 88%;
+    --ring: 217 91% 60%;
+    --radius: 0.5rem;
+
+    /* ---- 扩展 token（浅色） ---- */
+    --nx-accent: 217 91% 60%;
+    --nx-accent-glow: 217 91% 60% / 0.15;
+    --nx-accent-subtle: 217 91% 60% / 0.08;
+    --nx-accent-border: 217 91% 60% / 0.3;
+
+    /* 在线绿 */
+    --nx-online: 142 60% 38%;
+    --nx-online-glow: 142 60% 38% / 0.25;
+
+    /* 离线红 */
+    --nx-offline: 0 72% 51%;
+
+    /* 指标色 */
+    --nx-cpu: 217 91% 55%;
+    --nx-mem: 283 70% 60%;
+    --nx-disk: 30 85% 50%;
+
+    /* 文字层级 */
+    --nx-text-primary: 222 47% 11%;
+    --nx-text-secondary: 215 25% 30%;
+    --nx-text-muted: 215 16% 47%;
+    --nx-text-dim: 215 14% 60%;
+
+    /* 卡片 */
+    --nx-card-bg: 0 0% 100%;
+    --nx-card-border: 220 16% 88%;
+    --nx-card-hover-border: 217 91% 60% / 0.35;
+    --nx-card-hover-shadow: 217 91% 60% / 0.08;
+
+    /* 导航栏 */
+    --nx-nav-bg: 0 0% 100% / 0.92;
+    --nx-nav-border: 220 16% 86%;
+    --nx-nav-shadow: 220 16% 50% / 0.1;
+
+    /* 扫描线 —— 浅色模式下禁用 */
+    --nx-scan-color: 217 91% 60% / 0;
+    --nx-grid-line: 220 16% 75% / 0.5;
+
+    /* 背景光晕 */
+    --nx-glow-1: 217 91% 60% / 0.05;
+    --nx-glow-2: 283 70% 60% / 0.03;
+    --nx-glow-3: 142 60% 38% / 0.02;
+
+    /* uptime bar */
+    --nx-upbar-bg: 220 16% 88%;
+
+    /* chip */
+    --nx-chip-bg: 0 0% 100%;
+    --nx-chip-border: 220 16% 85%;
+    --nx-chip-text: 215 16% 47%;
+    --nx-chip-active-bg: 217 91% 60% / 0.08;
+    --nx-chip-active-border: 217 91% 60% / 0.5;
+    --nx-chip-active-text: 217 91% 50%;
+
+    /* 侧边栏 */
+    --nx-sidebar-bg: 220 17% 92%;
+    --nx-sidebar-border: 220 16% 86%;
+  }
+
+  /* =====================================================
+     深色主题：冷蓝灰调
+     ===================================================== */
+  .dark {
+    --background: 220 12% 8%;
+    --foreground: 220 14% 92%;
+    --card: 220 12% 11%;
+    --card-foreground: 220 14% 92%;
+    --popover: 220 12% 12%;
+    --popover-foreground: 220 14% 92%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 10% 15%;
+    --secondary-foreground: 220 12% 75%;
+    --muted: 220 10% 14%;
+    --muted-foreground: 220 8% 48%;
+    --accent: 220 10% 15%;
+    --accent-foreground: 220 14% 92%;
+    --destructive: 0 72% 56%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 10% 18%;
+    --input: 220 10% 15%;
+    --ring: 217 91% 60%;
+
+    --nx-accent: 217 91% 65%;
+    --nx-accent-glow: 217 91% 65% / 0.2;
+    --nx-accent-subtle: 217 91% 65% / 0.08;
+    --nx-accent-border: 217 91% 65% / 0.35;
+
+    --nx-online: 142 60% 52%;
+    --nx-online-glow: 142 60% 52% / 0.4;
+
+    --nx-offline: 0 72% 56%;
+
+    --nx-cpu: 217 91% 65%;
+    --nx-mem: 283 70% 68%;
+    --nx-disk: 30 85% 58%;
+
+    --nx-text-primary: 220 14% 88%;
+    --nx-text-secondary: 220 10% 62%;
+    --nx-text-muted: 220 8% 48%;
+    --nx-text-dim: 220 6% 38%;
+
+    --nx-card-bg: 220 12% 11%;
+    --nx-card-border: 220 10% 18%;
+    --nx-card-hover-border: 217 91% 65% / 0.4;
+    --nx-card-hover-shadow: 217 91% 65% / 0.08;
+
+    --nx-nav-bg: 220 12% 9% / 0.95;
+    --nx-nav-border: 220 10% 18%;
+    --nx-nav-shadow: 220 12% 3% / 0.5;
+
+    --nx-scan-color: 217 91% 65% / 0;
+    --nx-grid-line: 220 10% 28% / 0.5;
+
+    --nx-glow-1: 217 91% 65% / 0.04;
+    --nx-glow-2: 283 70% 68% / 0.03;
+    --nx-glow-3: 142 60% 52% / 0.02;
+
+    --nx-upbar-bg: 220 10% 18%;
+
+    --nx-chip-bg: 220 12% 11%;
+    --nx-chip-border: 220 10% 20%;
+    --nx-chip-text: 220 8% 50%;
+    --nx-chip-active-bg: 217 91% 65% / 0.1;
+    --nx-chip-active-border: 217 91% 65% / 0.6;
+    --nx-chip-active-text: 217 91% 65%;
+
+    --nx-sidebar-bg: 220 12% 9%;
+    --nx-sidebar-border: 220 10% 18%;
+  }
+
+  * { @apply border-border; }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 等宽字体 */
+  .font-mono, code, pre {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  /* 自定义滚动条 */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--nx-text-dim)); }
+}
+
+/* ===== Animations ===== */
+@keyframes num-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 4px hsl(var(--nx-online) / 0.8); }
+  50%       { box-shadow: 0 0 8px hsl(var(--nx-online) / 1.0); }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.num-flash { animation: num-in 0.2s ease-out; }
+
+/* ===== 背景 ===== */
+.bg-warm {
+  background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(ellipse 80% 60% at 10% 10%, hsl(217 91% 60% / 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 50% at 90% 80%, hsl(270 70% 65% / 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, hsl(142 60% 50% / 0.05) 0%, transparent 60%);
+  background-attachment: fixed;
+}
+
+/* 兼容旧类名 */
+.bg-nexus { @apply bg-warm; }
+.bg-soft   { @apply bg-warm; }
+
+/* ===== 卡片 ===== */
+.card-warm {
+  background: hsl(var(--nx-card-bg));
+  border: 1px solid hsl(var(--nx-card-border));
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px hsl(214 32% 50% / 0.07), 0 1px 2px hsl(214 32% 50% / 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.card-warm:hover {
+  border-color: hsl(var(--nx-card-hover-border));
+  box-shadow: 0 4px 12px hsl(214 32% 50% / 0.1), 0 2px 4px hsl(214 32% 50% / 0.06);
+}
+
+/* 兼容旧 card-nexus */
+.card-nexus { @apply card-warm; }
+.card-soft  { background: hsl(var(--nx-card-bg)); }
+
+.card-online  {}
+.card-offline {}
+
+/* ===== 侧边栏 ===== */
+.sidebar-warm {
+  background: hsl(var(--nx-sidebar-bg) / 0.88);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-right: 1px solid hsl(var(--nx-sidebar-border));
+}
+
+/* ===== 导航栏 ===== */
+.navbar-warm {
+  background: hsl(var(--nx-nav-bg));
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border-bottom: 1px solid hsl(var(--nx-nav-border));
+  box-shadow: 0 1px 12px hsl(var(--nx-nav-shadow));
+}
+
+/* 兼容旧类名 */
+.navbar-strip  { @apply navbar-warm; }
+.navbar-nexus  { @apply navbar-warm; }
+
+/* ===== 状态点 ===== */
+.status-online {
+  background: hsl(var(--nx-online));
+}
+
+.status-offline {
+  background: hsl(var(--nx-offline) / 0.4);
+}
+
+.status-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  animation: pulse-ring 2.5s ease-out infinite;
+}
+
+.status-online-ring {
+  border: 1.5px solid hsl(var(--nx-online) / 0.6);
+}
+
+/* ===== 进度条 ===== */
+.bar-cpu  { background: hsl(var(--nx-cpu)); }
+.bar-mem  { background: hsl(var(--nx-mem)); }
+.bar-disk { background: hsl(var(--nx-disk)); }
+.bar-warn { background: hsl(45 90% 52%); }
+.bar-crit { background: hsl(0 72% 51%); }
+
+/* ===== Uptime bars ===== */
+.upbar-online  { background: hsl(var(--nx-online) / 0.45); }
+.upbar-offline { background: hsl(var(--nx-offline) / 0.25); }
+.upbar-empty   { background: hsl(var(--nx-upbar-bg)); }
+
+/* ===== 在线状态指示灯 ===== */
+.online-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: hsl(var(--nx-online));
+}
+
+/* ===== Chips / Tags ===== */
+.chip-nexus {
+  font-family: inherit;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 1px solid hsl(var(--nx-chip-border));
+  background: hsl(var(--nx-chip-bg));
+  color: hsl(var(--nx-chip-text));
+  transition: all 0.15s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+.chip-nexus:hover {
+  border-color: hsl(var(--nx-accent-border));
+  color: hsl(var(--nx-accent));
+}
+.chip-nexus-active {
+  border-color: hsl(var(--nx-chip-active-border));
+  background: hsl(var(--nx-chip-active-bg));
+  color: hsl(var(--nx-chip-active-text));
+}
+
+/* ===== View transitions ===== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* ===== scan overlay（保留兼容，无效果） ===== */
+.scan-overlay::before { display: none; }
