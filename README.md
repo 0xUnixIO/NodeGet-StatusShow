@@ -1,6 +1,8 @@
 # NodeGet-StatusShow
 
-一个服务器状态展示页
+一个服务器状态展示页，NodeGet的公开探针页面
+
+欢迎开发者基于此版本进行定制，也欢迎 pr 到本项目
 
 ## 开发
 
@@ -8,20 +10,58 @@
 npm i
 npm run dev
 ```
-
-# 部署
-
-build 完是纯静态站 丢哪都行
-
 ## 一键部署
+一键部署需要主控的版本在0.2.6以上，请先到[控制面板](https://dash.nodeget.com/#/dashboard/node-manage?tab=servers)查看主控版本
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/NodeSeekDev/NodeGet-StatusShow&env=SITE_1,SITE_NAME,SITE_LOGO,SITE_FOOTER&envDescription=站点信息和主控连接&envLink=https://github.com/NodeSeekDev/NodeGet-StatusShow%23环境变量)
+<a href="https://dash.nodeget.com/#/dashboard/theme-management?add=https://nodeget.pages.dev">
+  <img src="https://dash.nodeget.com/deploy-button.png" alt="deploy button" width="230px" />
+</a>
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/NodeSeekDev/NodeGet-StatusShow)
 
-# 环境变量
+## 基于静态文件部署
+
+本项目 build 完是纯静态站， 丢哪都行
+
+官方准备了一份可以直接下载的编译结果，方便需要把静态文件部署到其他地方的用户
+
+此下载链接始终与最新版保持一致，利用cloudflare pages自动编译生成
+
+<https://nodeget.pages.dev/NodeGet-StatusShow.zip>
+
+下载后修改 config.json 的信息，然后可以上传到任意静态文件服务，如 nginx、 cloudflare pages、vercel
+
+## 基于 cloudflare pages编译部署
+
+此为官方最推荐的部署方式，方便升级至新版
+
+Fork本仓库, 然后在cloudflare pages / vercel 直接部署，绑定域名
+
+设定环境变量 `NODEGET_CONFIG`，需要是有效的JSON字符串
+
+```json
+{
+  "user_preferences":{
+    "site_name": "NodeGet Status",
+    "site_logo": "",
+    "footer": "Powered by NodeGet"
+  },
+  "site_tokens": [
+    {
+      "name": "master server node 1",
+      "backend_url": "wss://your-backend.example.com",
+      "token": "YOUR_TOKEN_HERE"
+    }
+  ]
+}
+```
+
+要更新版本则就在 fork 的 GitHub 仓库点击 sync 就行，可以轻松且可控的升级
 
 > 环境变量是 **build 时** 注入的 改完之后必须重新部署一次才会生效 在面板里光改不重新跑 build 是没用的
+
+## 环境变量(旧版)
+
+旧版没有充分考虑扩展性，只支持有限的环境变量
 
 ```
 SITE_NAME=狼牙的探针
