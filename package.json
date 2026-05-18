@@ -21,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "d3-geo": "^3.1.1",
+    "echarts": "^5.6.0",
     "lucide-react": "^0.460.0",
     "motion": "^12.38.0",
     "pretty-bytes": "^6.1.1",
@@ -28,8 +29,7 @@
     "react-dom": "^18.3.1",
     "react-simple-maps": "^3.0.0",
     "recharts": "^2.13.3",
-    "rpc-websockets": "^9.0.4",
-    "sonner": "^2.0.7",
+"sonner": "^2.0.7",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "topojson-client": "^3.1.0",
@@ -44,6 +44,7 @@
     "@types/topojson-client": "^3.1.5",
     "@types/topojson-specification": "^1.0.5",
     "@vitejs/plugin-react": "^6.0.1",
+    "archiver": "^8.0.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
@@ -51,6 +52,7 @@
     "vite": "^8.0.10"
   },
   "overrides": {
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.0",
+    "d3-color": "^3.1.0"
   }
 }

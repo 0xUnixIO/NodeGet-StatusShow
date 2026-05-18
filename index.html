@@ -6,7 +6,14 @@
     <meta name="description" content="Next-generation server monitoring and management tools" />
     <link rel="icon" type="image/png" href="./logo.png" />
     <title>WYNN</title>
-    <script>document.documentElement.classList.add('dark')</script>
+    <script>
+      try {
+        var t = localStorage.getItem('nodeget.theme')
+        if (t !== 'light') {
+          document.documentElement.classList.add('dark')
+        }
+      } catch (_) {}
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />

@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 import { BackendPool } from '../api/pool'
 import { dynamicSummaryMulti, kvGetMulti, listAgentUuids, queryNodeTcpPings, queryTcpPings, querySummaryHistory, staticDataMulti } from '../api/methods'
 import { isOnline } from '../utils/status'
-import type { DynamicSummary, HistorySample, Node, NodeMeta, SiteConfig, TcpPingRecord } from '../types'
+import type { DynamicSummary, HistorySample, Node, NodeMeta, Site_Config, TcpPingRecord } from '../types'
 
 type Agent = Pick<Node, 'uuid' | 'source' | 'meta' | 'static'>
 
@@ -96,7 +96,7 @@ function sampleFrom(row: DynamicSummary): HistorySample {
   }
 }
 
-export function useNodes(config: SiteConfig | null) {
+export function useNodes(config: Site_Config | null) {
   const [agents, setAgents] = useState<Map<string, Agent>>(new Map())
   // live 只在 nodes useMemo 中读取，不需要触发完整的状态更新路径，用 ref 存数据 + 版本号触发重渲染
   const liveRef = useRef<Map<string, DynamicSummary>>(new Map())

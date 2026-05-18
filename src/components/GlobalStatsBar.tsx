@@ -14,7 +14,7 @@ export function GlobalStatsBar({ nodes }: { nodes: Node[] }) {
       ? withMem.reduce((s, n) => s + (deriveUsage(n).mem ?? 0), 0) / withMem.length
       : 0
 
-    const withDisk = nodes.filter(n => n.dynamic?.hdd_total != null)
+    const withDisk = nodes.filter(n => n.dynamic?.total_space != null)
     const avgDisk = withDisk.length
       ? withDisk.reduce((s, n) => s + (deriveUsage(n).disk ?? 0), 0) / withDisk.length
       : 0

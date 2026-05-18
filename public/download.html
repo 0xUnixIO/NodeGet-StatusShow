@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NodeGet Theme Downloader</title>
+  <link rel="icon" type="image/png" href="./logo.png" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+    integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    /* 全局样式 */
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f3f4f6;
+      color: #111827;
+      margin: 0;
+      padding: 0;
+    }
+
+    a {
+      text-decoration: none;
+      color: #3b82f6;
+      font-weight: 500;
+    }
+
+    header {
+      background: #fff;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    main {
+      max-width: 640px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.6;
+      text-align: center;
+      color: #374151;
+    }
+
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover:not(:disabled) {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      background: #a5b4fc;
+      cursor: not-allowed;
+    }
+
+    /* 文件列表 */
+    .file-list {
+      width: 100%;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .file-item {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      transition: background 0.15s;
+    }
+
+    .file-item:last-child {
+      border-bottom: none;
+    }
+
+    .file-item:hover {
+      background: #f9fafb;
+    }
+
+    .progress-container {
+      width: 100%;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.25rem;
+      height: 6px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #3b82f6;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .error {
+      color: #ef4444;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+    }
+
+    /* 响应式 */
+    @media (max-width: 640px) {
+      header {
+        padding: 1rem;
+      }
+
+      main {
+        margin: 2rem auto;
+        padding: 0 0.75rem;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+  <header>
+    <h1>NodeGet Theme Downloader</h1>
+    <a href="/" id="home-link">Home</a>
+  </header>
+  <main>
+    <p style="margin-top: 200px;">
+     提取当前网站正在使用的 NodeGet 主题，下载后修改 nodeget-theme.json 即可将压缩包部署到任意静态储存服务。
+    </p>
+    <button id="start-btn" style="margin: 20px auto 20px;display: block;">开始下载</button>
+    <div id="overall-progress" class="progress-container" style="display:none;">
+      <div class="progress-bar" id="overall-bar"></div>
+    </div>
+    <div class="file-list" id="file-list"></div>
+  </main>
+
+  <script type="module">
+
+    const startBtn = document.getElementById('start-btn')
+    const fileListEl = document.getElementById('file-list')
+    const overallProgress = document.getElementById('overall-progress')
+    const overallBar = document.getElementById('overall-bar')
+    const getRandStr = () => Date.now() + '-' + crypto.randomUUID().replaceAll(/-/g, "").slice(10)
+
+    let fileEntries = []
+
+    startBtn.addEventListener('click', async () => {
+      startBtn.disabled = true
+      fileListEl.innerHTML = ''
+      overallProgress.style.display = 'block'
+
+      try {
+        const res = await fetch('nodeget-theme-files.json' + '?_=' + getRandStr())
+        fileEntries = await res.json() // 假设是扁平数组 ["assets/index.js","images/logo.png",...]
+      } catch (err) {
+        startBtn.disabled = false
+        return
+      }
+
+      const zip = new JSZip()
+      let completed = 0
+
+      for (const path of fileEntries) {
+        let fileItemEl = document.createElement('div')
+        fileItemEl.className = 'file-item'
+        fileItemEl.textContent = path
+        const statusEl = document.createElement('span')
+        statusEl.textContent = '等待'
+        fileItemEl.appendChild(statusEl)
+        fileListEl.appendChild(fileItemEl)
+
+        await downloadFileWithRetry(path, 3, zip, statusEl, () => {
+          completed++
+          overallBar.style.width = ((completed / fileEntries.length) * 100).toFixed(2) + '%'
+        })
+      }
+
+      // 生成 zip 并下载
+      const blob = await zip.generateAsync({ type: 'blob' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'nodeget-theme.zip'
+      a.click()
+      URL.revokeObjectURL(url)
+      startBtn.disabled = false
+    })
+
+    // 下载文件带重试
+    async function downloadFileWithRetry(path, retries, zip, statusEl, progressCallback) {
+      for (let i = 0; i < retries; i++) {
+        try {
+          statusEl.textContent = '下载中...'
+          const res = await fetch(path + '?_=' + getRandStr())
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          const blob = await res.blob()
+          zip.file(path, blob)
+          statusEl.textContent = '完成'
+          progressCallback()
+          return
+        } catch (err) {
+          console.error(err)
+          statusEl.textContent = `错误，重试中 (${i + 1})`
+          await new Promise(r => setTimeout(r, 1000))
+        }
+      }
+      statusEl.textContent = '下载失败'
+      statusEl.classList.add('error')
+      progressCallback()
+    }
+  </script>
+</body>
+
+</html>

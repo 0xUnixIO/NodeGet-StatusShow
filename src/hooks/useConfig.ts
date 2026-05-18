@@ -1,23 +1,32 @@
 import { useEffect, useState } from 'react'
-import type { SiteConfig } from '../types'
+import type { Site_Config } from '../types'
+import { useUserConfig } from "./useUserConfig"
+import { useThemeConfig } from "./useThemeConfig"
 
-export function useConfig() {
-  const [config, setConfig] = useState<SiteConfig | null>(null)
+export function useConfig(){
+  const { config: userConfig, error: userError } = useUserConfig()
+  const { config: themeConfig, error: themeError } = useThemeConfig()
+  const [config, setConfig] = useState<Site_Config | null>(null)
   const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    let alive = true
-    fetch('config.json', { cache: 'no-cache' })
-      .then(r => {
-        if (!r.ok) throw new Error(`config.json ${r.status}`)
-        return r.json() as Promise<SiteConfig>
-      })
-      .then(c => alive && setConfig(c))
-      .catch(e => alive && setError(e))
-    return () => {
-      alive = false
+    // 如果任一配置有错误，返回第一个错误
+    if (userError) {
+      setError(userError)
+      return
     }
-  }, [])
+    if (themeError) {
+      setError(themeError)
+      return
+    }
+
+    // 两个配置都加载成功后，合并它们
+    if (userConfig && themeConfig) {
+      const merged = { ...themeConfig, ...userConfig } as Site_Config
+      setConfig(merged)
+      setError(null)
+    }
+  }, [userConfig, themeConfig, userError, themeError])
 
   return { config, error }
 }

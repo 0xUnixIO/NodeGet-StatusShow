@@ -90,8 +90,8 @@ export function App() {
   }, [])
 
   useEffect(() => {
-    if (config?.site_name) document.title = config.site_name
-  }, [config?.site_name])
+    if (config?.user_preferences?.site_name) document.title = config.user_preferences.site_name
+  }, [config?.user_preferences?.site_name])
 
   // 选中节点不再写入 URL hash —— 仅作为本地状态弹窗使用
 
@@ -187,7 +187,7 @@ export function App() {
     return <LoadingScreen />
   }
 
-  const logo = config.site_logo || DEFAULT_LOGO
+  const logo = config.user_preferences?.site_logo || DEFAULT_LOGO
   const empty = list.length === 0
   const hasErrors = errors.length > 0
   const allNodes = allNodesForEvents
@@ -200,7 +200,7 @@ export function App() {
 
       {/* 顶部导航栏 */}
       <Navbar
-        siteName={config.site_name || '节点监控'}
+        siteName={config.user_preferences?.site_name || 'NodeGet'}
         logo={logo}
         regions={allRegions}
         regionCounts={regionCounts}
@@ -341,7 +341,7 @@ export function App() {
         )}
       </main>
 
-      <Footer text={config.footer} nodes={allNodes} />
+      <Footer text={config.user_preferences?.footer} nodes={allNodes} />
 
       {/* 节点详情：始终以全屏模态显示 */}
       <NodeDetail

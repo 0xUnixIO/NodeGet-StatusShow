@@ -7,6 +7,10 @@ export interface NodeMeta {
   lat: number | null
   lng: number | null
   order: number
+  price?: number
+  priceUnit?: string
+  priceCycle?: number
+  expireTime?: string
 }
 
 export interface StaticSystem {
@@ -68,7 +72,7 @@ export interface DynamicSummary {
 export interface HistorySample {
   t: number
   online: boolean
-  rate?: number | null  // 桶内在线率 0-1，仅 fetchUptimeHistory 返回
+  rate?: number | null
   cpu: number | null
   mem: number | null
   disk: number | null
@@ -79,7 +83,7 @@ export interface HistorySample {
 export interface TcpPingRecord {
   t: number
   cron: string
-  latency: number | null // null = 超时/丢包
+  latency: number | null
 }
 
 export interface Node {
@@ -93,14 +97,75 @@ export interface Node {
   tcpPings: TcpPingRecord[]
 }
 
-export interface SiteConfig {
-  site_name?: string
-  site_logo?: string
-  footer?: string
-  site_tokens: { name: string; backend_url: string; token: string }[]
+export interface ThemeConfig {
+  "name": string
+  "description": string
+  "author"?: string
+  "repository"?: string
+  "dist_page"?: string
+  "user_preferences_form": {
+    version: string
+    items: any[]
+  }
+  "version"?: string
+  "license"?: string
+}
+
+export interface UserConfig {
+  "user_preferences": {
+    site_name?: string
+    site_logo?: string
+    footer?: string
+  }
+  site_tokens: {
+    name: string
+    backend_url: string
+    token: string
+  }[]
+}
+
+export type Site_Config = ThemeConfig & UserConfig
+
+export interface TaskQueryResult {
+  task_id: number
+  timestamp: number
+  uuid: string
+  success: boolean
+  error_message?: string | null
+  cron_source?: string
+  task_event_type?: Record<string, string>
+  task_event_result: Record<string, unknown> | null
+}
+
+export interface TaskQueryCondition {
+  task_id?: number
+  uuid?: string
+  timestamp_from_to?: [number, number]
+  timestamp_from?: number
+  timestamp_to?: number
+  is_success?: boolean
+  is_failure?: boolean
+  is_running?: boolean
+  type?: string
+  cron_source?: string
+  limit?: number
+  last?: null
 }
 
 export type View = 'cards' | 'table' | 'map'
+
+export type Sort =
+  | 'default'
+  | 'name'
+  | 'region'
+  | 'cpu'
+  | 'mem'
+  | 'disk'
+  | 'netIn'
+  | 'netOut'
+  | 'uptime'
+
+export type LatencyType = 'ping' | 'tcp_ping'
 
 export interface Usage {
   cpu?: number

@@ -144,3 +144,7 @@ vite.config.ts.timestamp-*
 
 # Vite local-only overrides (config.local.json, etc.)
 *.local
+
+.idea
+nodeget-theme.dev.json
+nodeget-theme.dev.jsonc

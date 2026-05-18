@@ -51,6 +51,7 @@ const DISTROS = [
   { file: 'ubuntu.svg', match: ['ubuntu'] },
   { file: 'mint.svg', match: ['mint'] },
   { file: 'debian.svg', match: ['debian'] },
+  { file: 'alpinelinux-icon.svg', match: ['alpine'] },
   { file: 'fedora.svg', match: ['fedora'] },
   { file: 'rocky.svg', match: ['rocky'] },
   { file: 'oracle.svg', match: ['oracle'] },

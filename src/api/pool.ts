@@ -17,7 +17,7 @@ export class BackendPool {
   constructor(tokens: BackendToken[]) {
     this.entries = tokens.map(t => ({
       name: t.name,
-      client: new RpcClient(t.backend_url, t.token),
+      client: new RpcClient(t.backend_url, t.token, t.name),
     }))
   }
 
