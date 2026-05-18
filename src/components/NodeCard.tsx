@@ -38,12 +38,14 @@ function UsageBar({ value, label, detail }: { value: number | undefined; label: 
 }
 
 function MiniChart({
+  uid,
   data,
   dataKeys,
   colors,
   legend,
   formatter,
 }: {
+  uid: string
   data: Record<string, string | number>[]
   dataKeys: string[]
   colors: string[]
@@ -66,7 +68,7 @@ function MiniChart({
           <AreaChart data={data} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
             <defs>
               {dataKeys.map((key, i) => (
-                <linearGradient key={key} id={`gradient-${key}-${data[0]?.time}`} x1="0" y1="0" x2="0" y2="1">
+                <linearGradient key={key} id={`gradient-${uid}-${key}`} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={colors[i]} stopOpacity={0.2} />
                   <stop offset="100%" stopColor={colors[i]} stopOpacity={0} />
                 </linearGradient>
@@ -96,7 +98,7 @@ function MiniChart({
                 dataKey={key}
                 stroke={colors[i]}
                 strokeWidth={1}
-                fill={`url(#gradient-${key}-${data[0]?.time})`}
+                fill={`url(#gradient-${uid}-${key})`}
                 dot={false}
                 isAnimationActive={false}
               />
@@ -238,13 +240,14 @@ export const NodeCard = memo(function NodeCard({ node }: { node: Node }) {
           <UsageBar value={u.disk} label="Disk" detail={diskDetail} />
         </div>
 
-        {/* 图表：网络 + Ping 横排 */}
+        {/* 图表：网络 + Ping，小屏纵排，大屏横排 */}
         {(hasNetwork || hasPing) && (
-          <div className="flex gap-4 pt-3 border-t"
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-3 border-t"
             style={{ borderColor: 'hsl(var(--border) / 0.5)' }}
             onClick={e => e.preventDefault()}>
             {hasNetwork && (
               <MiniChart
+                uid={`${node.uuid}-net`}
                 data={networkData}
                 dataKeys={['in', 'out']}
                 colors={['#10b981', '#3b82f6']}
@@ -260,6 +263,7 @@ export const NodeCard = memo(function NodeCard({ node }: { node: Node }) {
             )}
             {hasPing && (
               <MiniChart
+                uid={`${node.uuid}-ping`}
                 data={pingData}
                 dataKeys={cronNames}
                 colors={cronNames.map((c, i) => ispColor(c, i))}

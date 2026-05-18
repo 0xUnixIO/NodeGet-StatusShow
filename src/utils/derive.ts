@@ -5,13 +5,14 @@ export function deriveUsage(node: Node): Usage {
   const memUsed = d?.used_memory ?? 0
   const memTotal = d?.total_memory ?? 0
   const diskTotal = d?.total_space ?? 0
-  const diskUsed = diskTotal && d?.available_space != null ? diskTotal - d.available_space : 0
+  const hasDiskData = diskTotal > 0 && d?.available_space != null
+  const diskUsed = hasDiskData ? diskTotal - d!.available_space! : 0
   return {
     cpu: d?.cpu_usage,
     mem: memTotal ? (memUsed / memTotal) * 100 : undefined,
     memUsed,
     memTotal,
-    disk: diskTotal ? (diskUsed / diskTotal) * 100 : undefined,
+    disk: hasDiskData ? (diskUsed / diskTotal) * 100 : undefined,
     diskUsed,
     diskTotal,
     netIn: d?.receive_speed,

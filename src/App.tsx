@@ -246,7 +246,7 @@ export function App() {
                 <button
                   type="button"
                   onClick={() => setView('map')}
-                  className="flex shrink-0 items-center justify-center gap-2 px-4 py-2 lg:py-0 text-[10px] uppercase tracking-[0.2em] font-bold transition-colors hover:bg-[hsl(var(--secondary))] border-t lg:border-t-0 lg:border-l"
+                  className="hidden sm:flex shrink-0 items-center justify-center gap-2 px-4 py-2 lg:py-0 text-[10px] uppercase tracking-[0.2em] font-bold transition-colors hover:bg-[hsl(var(--secondary))] border-t lg:border-t-0 lg:border-l"
                   style={{ color: 'hsl(var(--nx-text-secondary))', borderColor: 'hsl(var(--border) / 0.6)' }}
                 >
                   <MapIcon className="h-3.5 w-3.5" />

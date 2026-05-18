@@ -32,9 +32,7 @@ function fmtBytesShort(v: number) {
 }
 
 export function IndexChart({ nodes }: { nodes: Node[] }) {
-  // 1. 把所有节点的 history.netIn+netOut 按 5s 子桶聚合 → 全网总速率作为指数采样
-  //    再按 BUCKET_MS 把 6 个子样本组成 OHLC 蜡烛
-  const candles = useMemo<Candle[]>(() => {
+  const allCandles = useMemo<Candle[]>(() => {
     // sub bucket: 时间桶 → 桶内全网总速率累加（同一桶可能含多个 sample，取平均）
     type SB = { sum: number; cnt: number }
     const sub = new Map<number, SB>()
@@ -81,30 +79,13 @@ export function IndexChart({ nodes }: { nodes: Node[] }) {
     return list.slice(-MAX_BARS)
   }, [nodes])
 
-  const last = candles.at(-1)
-  const prev = candles.length >= 2 ? candles[candles.length - 2] : null
-  const first = candles[0]
-  const valNow = last?.c ?? null
-  // 头部数字色：相对窗口起点的累计变化（决定红绿趋势）
-  const trendChg = first && last ? last.c - first.o : null
-  // Δ 显示：相对上一根 close（最近一根 K 线涨跌幅）
-  const barChg = prev && last ? last.c - prev.c : null
-  const barChgPct = prev && last && prev.c > 0 ? ((last.c - prev.c) / prev.c) * 100 : null
-  const valChg = barChg
-
-  // 网速：上涨 = 流量增加 = 涨（绿）；下跌 = 流量收缩 = 跌（红）（按"成交量/活跃度"语义）
-  const headColor = trendChg == null ? FLAT : trendChg > 0 ? UP : trendChg < 0 ? DOWN : FLAT
-  const barColor = barChg == null ? FLAT : barChg > 0 ? UP : barChg < 0 ? DOWN : FLAT
-
   const wrapRef = useRef<HTMLDivElement>(null)
   const [w, setW] = useState(800)
   const [hoverIdx, setHoverIdx] = useState<number | null>(null)
   const [hoverX, setHoverX] = useState(0)
   useEffect(() => {
     if (!wrapRef.current) return
-    const ro = new ResizeObserver(es => {
-      for (const e of es) setW(e.contentRect.width)
-    })
+    const ro = new ResizeObserver(([entry]) => setW(entry.contentRect.width))
     ro.observe(wrapRef.current)
     return () => ro.disconnect()
   }, [])
@@ -116,6 +97,25 @@ export function IndexChart({ nodes }: { nodes: Node[] }) {
   const padLeft = 4
   const innerW = Math.max(0, w - padLeft - padRight)
   const priceH = H - padTop - padBot
+
+  // 每根蜡烛最少 5px，移动端自动减少柱子数量
+  const maxVisible = Math.max(20, Math.floor(innerW / 5))
+  const candles = useMemo(
+    () => allCandles.slice(-maxVisible),
+    [allCandles, maxVisible],
+  )
+
+  const last = candles.at(-1)
+  const prev = candles.length >= 2 ? candles[candles.length - 2] : null
+  const first = candles[0]
+  const valNow = last?.c ?? null
+  const trendChg = first && last ? last.c - first.o : null
+  const barChg = prev && last ? last.c - prev.c : null
+  const barChgPct = prev && last && prev.c > 0 ? ((last.c - prev.c) / prev.c) * 100 : null
+  const valChg = barChg
+
+  const headColor = trendChg == null ? FLAT : trendChg > 0 ? UP : trendChg < 0 ? DOWN : FLAT
+  const barColor = barChg == null ? FLAT : barChg > 0 ? UP : barChg < 0 ? DOWN : FLAT
 
   const { lo, hi } = useMemo(() => {
     if (!candles.length) return { lo: 1, hi: 1024 }
@@ -133,8 +133,6 @@ export function IndexChart({ nodes }: { nodes: Node[] }) {
     const padLog = Math.max(0.05, (logHi - logLo) * 0.15)
     return { lo: Math.pow(10, logLo - padLog), hi: Math.pow(10, logHi + padLog) }
   }, [candles])
-
-            {/* EMA(9) 折线 - 已移除 */}
 
   const yOf = (v: number) => {
     const lv = Math.log10(Math.max(1, v))
@@ -161,9 +159,9 @@ export function IndexChart({ nodes }: { nodes: Node[] }) {
       }}
       className="flex"
     >
-      {/* 左侧：指数标识 + 当前值 */}
+      {/* 左侧：指数标识 + 当前值（手机隐藏） */}
       <div
-        className="shrink-0 px-3 py-1.5 border-r flex flex-col justify-center min-w-[230px]"
+        className="hidden sm:flex shrink-0 px-3 py-1.5 border-r flex-col justify-center min-w-[200px]"
         style={{ borderColor: 'hsl(var(--border) / 0.5)' }}
       >
         <div
@@ -335,7 +333,7 @@ export function IndexChart({ nodes }: { nodes: Node[] }) {
           const c = candles[hoverIdx]
           const up = c.c >= c.o
           const tipColor = up ? UP : DOWN
-          const tipW = 200
+          const tipW = Math.min(200, w - padLeft - padRight - 8)
           // 智能定位：右侧空间不够时贴左边
           const left = Math.min(w - padRight - tipW - 4, Math.max(padLeft, hoverX + 12))
           return (

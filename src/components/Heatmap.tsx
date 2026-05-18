@@ -72,7 +72,7 @@ export function Heatmap({ nodes, onSelect }: { nodes: Node[]; onSelect?: (uuid: 
       <div
         className="grid gap-[3px] p-2"
         style={{
-          gridTemplateColumns: 'repeat(auto-fill, minmax(64px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(52px, 1fr))',
         }}
       >
         {tiles.map(t => {

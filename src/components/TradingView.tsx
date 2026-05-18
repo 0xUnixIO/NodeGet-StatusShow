@@ -293,7 +293,7 @@ const Row = memo(function Row({ node, selected, dim, onSelect }: { node: Node; s
       onClick={() => onSelect?.(node.uuid)}
       className="grid items-center gap-3 pl-0 pt-0 pb-0 pr-3 text-[11px] font-mono group relative text-left cursor-pointer w-full appearance-none bg-transparent border-0 m-0 font-[inherit] text-inherit"
       style={{
-        gridTemplateColumns: '10px minmax(80px, 1.2fr) 52px 52px 60px 48px 52px 40px 68px 68px',
+        gridTemplateColumns: '10px minmax(80px, 1.2fr) 52px 52px 60px 48px 52px 40px 82px 82px',
         background: flashBg ?? baseBg,
         borderBottom: '1px solid hsl(var(--border) / 0.25)',
         color: 'hsl(var(--nx-text-primary))',
@@ -346,10 +346,10 @@ const Row = memo(function Row({ node, selected, dim, onSelect }: { node: Node; s
         {fmtPct(u.disk, 0)}
       </span>
       {/* NET ↑ ↓ */}
-      <span className="tabular-nums text-right text-[11px]" style={{ color: netSpeedColor(u.netOut ?? 0) }}>
+      <span className="tabular-nums text-right text-[11px] whitespace-nowrap" style={{ color: netSpeedColor(u.netOut ?? 0) }}>
         ↑{bytes(u.netOut ?? 0)}/s
       </span>
-      <span className="tabular-nums text-right text-[11px]" style={{ color: netSpeedColor(u.netIn ?? 0) }}>
+      <span className="tabular-nums text-right text-[11px] whitespace-nowrap" style={{ color: netSpeedColor(u.netIn ?? 0) }}>
         ↓{bytes(u.netIn ?? 0)}/s
       </span>
     </button>
@@ -374,12 +374,9 @@ export function WatchList({ nodes, selected, activeTag, activeRegion, onSelect }
     : nodes
   return (
     <div
-      className="overflow-hidden"
-      style={{
-        background: 'hsl(var(--card) / 0.65)',
-      }}
+      style={{ background: 'hsl(var(--card) / 0.65)' }}
     >
-      {/* Title bar */}
+      {/* Title bar 在滚动区外，始终全宽 */}
       <div
         className="flex items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.24em]"
         style={{
@@ -402,11 +399,14 @@ export function WatchList({ nodes, selected, activeTag, activeRegion, onSelect }
           {(activeTag || activeRegion) ? `${matchCount} / ${nodes.length} symbols` : `${nodes.length} symbols`}
         </span>
       </div>
+      <div className="overflow-x-auto scrollbar-thin">
+      {/* min-width 须 ≥ 固定列(478) + 9×gap(108) + Symbol最小(80) ≈ 666px */}
+      <div style={{ minWidth: 680 }}>
       {/* Header */}
       <div
         className="grid items-center gap-3 pr-3 py-1.5 text-[10px] uppercase tracking-[0.22em] font-semibold"
         style={{
-          gridTemplateColumns: '10px minmax(80px, 1.2fr) 52px 52px 60px 48px 52px 40px 68px 68px',
+          gridTemplateColumns: '10px minmax(80px, 1.2fr) 52px 52px 60px 48px 52px 40px 82px 82px',
           background: 'hsl(var(--secondary) / 0.8)',
           borderBottom: '1px solid hsl(var(--border) / 0.6)',
           color: 'hsl(var(--nx-text-muted))',
@@ -432,6 +432,8 @@ export function WatchList({ nodes, selected, activeTag, activeRegion, onSelect }
           50% { opacity: 0.3; }
         }
       `}</style>
+      </div>
+      </div>
     </div>
   )
 }

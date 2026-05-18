@@ -8,6 +8,19 @@
     -ms-overflow-style: none;
   }
   .scrollbar-none::-webkit-scrollbar { display: none; }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  .scrollbar-thin::-webkit-scrollbar { height: 3px; width: 3px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 2px; }
+
+  /* 触摸设备上隐藏细滚动条，避免占用空间 */
+  @media (pointer: coarse) {
+    .scrollbar-thin { scrollbar-width: none; }
+    .scrollbar-thin::-webkit-scrollbar { display: none; }
+  }
 }
 
 @layer base {
