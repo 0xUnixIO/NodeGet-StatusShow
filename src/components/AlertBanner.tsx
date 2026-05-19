@@ -14,8 +14,8 @@ function fmtBps(bps: number): string {
 
 type Alert = { uuid: string; level: 'halt' | 'warn'; text: string }
 
-// 每页最多显示几条（超过才翻页）
-const MAX_PER_PAGE = 5
+// 每次只显示 1 条，确保任意屏幕宽度都放得下
+const MAX_PER_PAGE = 1
 const INTERVAL_MS = 3500
 const TRANSITION_MS = 260
 
@@ -128,22 +128,19 @@ export function AlertBanner({ nodes, onSelect }: { nodes: Node[]; onSelect?: (uu
         {halts > 0 ? `HALT · ${halts}` : `WARN · ${alerts.length}`}
       </div>
 
-      {/* 当前页：横向排列所有告警，整页一起做竖向翻页动画 */}
+      {/* 当前条：竖向翻页动画 */}
       <div
         className="flex-1 min-w-0 flex items-center overflow-hidden"
         style={rowStyle}
       >
-        {visible.map((a, i) => (
+        {visible.map((a) => (
           <button
             key={a.uuid}
             type="button"
             onClick={() => onSelect?.(a.uuid)}
-            className="shrink-0 flex items-center px-3 text-[10px] font-bold font-mono tracking-wide uppercase appearance-none bg-transparent border-0 m-0 cursor-pointer"
+            className="shrink-0 flex items-center px-3 text-[10px] font-bold font-mono tracking-wide uppercase appearance-none bg-transparent border-0 m-0 cursor-pointer truncate"
             style={{ color: a.level === 'halt' ? RED : YELLOW }}
           >
-            {i > 0 && (
-              <span className="mr-3 opacity-30" style={{ color: halts > 0 ? RED : YELLOW }}>·</span>
-            )}
             ◆ {a.text}
           </button>
         ))}
