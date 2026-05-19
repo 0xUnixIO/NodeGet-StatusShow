@@ -286,15 +286,16 @@ const Row = memo(function Row({ node, selected, dim, onSelect }: { node: Node; s
       : flash === 'down'
         ? 'rgba(34, 197, 94, 0.22)'
         : null
+  const rowBg = flashBg ?? baseBg
 
   return (
     <button
       type="button"
       onClick={() => onSelect?.(node.uuid)}
-      className="grid items-center gap-3 pl-0 pt-0 pb-0 pr-3 text-[11px] font-mono group relative text-left cursor-pointer w-full appearance-none bg-transparent border-0 m-0 font-[inherit] text-inherit"
+      className="grid items-center gap-3 pt-0 pb-0 pr-3 text-[11px] font-mono group relative text-left cursor-pointer w-full appearance-none bg-transparent border-0 m-0 font-[inherit] text-inherit"
       style={{
-        gridTemplateColumns: '10px minmax(80px, 1.2fr) 52px 52px 60px 48px 52px 40px 82px 82px',
-        background: flashBg ?? baseBg,
+        gridTemplateColumns: 'minmax(160px, 1.8fr) 40px 52px 60px 48px 52px 40px 82px 82px',
+        background: rowBg,
         borderBottom: '1px solid hsl(var(--border) / 0.25)',
         color: 'hsl(var(--nx-text-primary))',
         height: 32,
@@ -303,26 +304,30 @@ const Row = memo(function Row({ node, selected, dim, onSelect }: { node: Node; s
         transition: 'background-color 250ms ease, opacity 200ms ease, filter 200ms ease',
       }}
     >
-      {/* 状态点 */}
-      <span className="flex items-center justify-center">
+      {/* 状态点 + 名称 + 地区（sticky 吸左） */}
+      <div
+        className="flex items-center gap-1.5 pl-3 h-full min-w-0 sticky left-0 z-10"
+        style={{
+          background: rowBg && rowBg !== 'transparent'
+            ? `linear-gradient(${rowBg}, ${rowBg}), hsl(var(--card))`
+            : 'hsl(var(--card))',
+        }}
+      >
         <span
-          className="inline-block w-1.5 h-1.5 rounded-full"
+          className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
           style={{
             background: node.online ? UP : DOWN,
             opacity: node.online ? 1 : 0.6,
             boxShadow: node.online ? `0 0 6px ${UP}` : 'none',
           }}
         />
-      </span>
-      {/* 名称 + 地区 */}
-      <div className="flex items-center gap-1.5 min-w-0">
         {node.meta?.region && <Flag code={node.meta.region} />}
         <span className="truncate text-[12px] font-semibold tracking-wide" style={{ color: 'hsl(var(--nx-text-primary))' }}>
           {displayName(node)}
         </span>
       </div>
       {/* CPU 大数 */}
-      <span className="tabular-nums text-right text-[12px] font-bold" style={{ color: loadColor(u.cpu, node.online) }}>
+      <span className="tabular-nums text-right text-[11px] font-bold" style={{ color: loadColor(u.cpu, node.online) }}>
         {fmtPct(u.cpu)}
       </span>
       {/* CPU Δ */}
@@ -400,20 +405,22 @@ export function WatchList({ nodes, selected, activeTag, activeRegion, onSelect }
         </span>
       </div>
       <div className="overflow-x-auto scrollbar-thin">
-      {/* min-width 须 ≥ 固定列(478) + 9×gap(108) + Symbol最小(80) ≈ 666px */}
-      <div style={{ minWidth: 680 }}>
+      {/* min-width: Symbol(160) + 8列(468) + 8gap(96) = 724px */}
+      <div style={{ minWidth: 760 }}>
       {/* Header */}
       <div
         className="grid items-center gap-3 pr-3 py-1.5 text-[10px] uppercase tracking-[0.22em] font-semibold"
         style={{
-          gridTemplateColumns: '10px minmax(80px, 1.2fr) 52px 52px 60px 48px 52px 40px 82px 82px',
+          gridTemplateColumns: 'minmax(160px, 1.8fr) 40px 52px 60px 48px 52px 40px 82px 82px',
           background: 'hsl(var(--secondary) / 0.8)',
           borderBottom: '1px solid hsl(var(--border) / 0.6)',
           color: 'hsl(var(--nx-text-muted))',
         }}
       >
-        <span />
-        <span>Symbol</span>
+        <span
+          className="pl-3 sticky left-0 z-10"
+          style={{ background: 'hsl(var(--secondary))' }}
+        >Symbol</span>
         <span className="text-right">CPU</span>
         <span className="text-right">Δ 5m</span>
         <span className="text-right">Trend</span>
