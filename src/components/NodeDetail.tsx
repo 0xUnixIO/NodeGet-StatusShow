@@ -10,7 +10,7 @@ import { UptimeBars } from './UptimeBars'
 import { bytes, pct, relativeAge, uptime } from '../utils/format'
 import { deriveUsage, displayName, distroLogo, osLabel, virtLabel } from '../utils/derive'
 import { strokeColor } from '../utils/cn'
-import { ispColor, shortCron } from '../utils/tcpping'
+import { buildPingBuckets, ispColor, shortCron } from '../utils/tcpping'
 import type { HistorySample, Node, TcpPingRecord } from '../types'
 
 const TOOLTIP_STYLE = {
@@ -371,32 +371,7 @@ function applyEwma(
   })
 }
 
-function buildLatencyData(pings: TcpPingRecord[], cronNames: string[]) {
-  const BUCKET = 30_000
-  const snap = (t: number) => Math.round(t / BUCKET) * BUCKET
-  // 每个桶内按 ISP 累积成功延迟，最终取均值
-  const acc = new Map<number, Map<string, number[]>>()
-  for (const p of pings) {
-    if (p.latency == null) continue
-    const t = snap(p.t)
-    const m = acc.get(t) ?? new Map<string, number[]>()
-    if (!acc.has(t)) acc.set(t, m)
-    const arr = m.get(p.cron) ?? []
-    arr.push(p.latency)
-    m.set(p.cron, arr)
-  }
-  return [...acc.entries()]
-    .sort((a, b) => a[0] - b[0])
-    .map(([t, m]) => ({
-      t,
-      ...Object.fromEntries(
-        cronNames.map(c => {
-          const vals = m.get(c)
-          return [c, vals?.length ? vals.reduce((s, v) => s + v, 0) / vals.length : null]
-        })
-      ),
-    }))
-}
+const buildLatencyData = buildPingBuckets
 
 function ispStats(pings: TcpPingRecord[], cron: string) {
   const records = pings.filter(p => p.cron === cron)

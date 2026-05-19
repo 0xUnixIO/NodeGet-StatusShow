@@ -6,7 +6,7 @@ import {
 import { Flag } from './Flag'
 import { bytes, uptime } from '../utils/format'
 import { cpuLabel, deriveUsage, displayName, distroLogo, osLabel, virtLabel } from '../utils/derive'
-import { ispColor, shortCron } from '../utils/tcpping'
+import { buildPingBuckets, ispColor, shortCron } from '../utils/tcpping'
 import type { Node } from '../types'
 
 function barColor(v: number) {
@@ -135,30 +135,16 @@ export const NodeCard = memo(function NodeCard({ node }: { node: Node }) {
 
   const pingData = useMemo(() => {
     if (!cronNames.length) return []
-    const BUCKET = 30_000
-    const snap = (t: number) => Math.round(t / BUCKET) * BUCKET
-    const acc = new Map<number, Map<string, number[]>>()
-    for (const p of node.tcpPings) {
-      if (p.latency == null) continue
-      const bt = snap(p.t)
-      if (!acc.has(bt)) acc.set(bt, new Map())
-      const m = acc.get(bt)!
-      const arr = m.get(p.cron) ?? []
-      arr.push(p.latency)
-      m.set(p.cron, arr)
-    }
-    const rows = [...acc.entries()]
-      .sort(([a], [b]) => a - b)
-      .map(([t, m]) => {
-        const row: Record<string, string | number> = {
-          time: new Date(t).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }),
-        }
-        for (const cron of cronNames) {
-          const vals = m.get(cron)
-          if (vals?.length) row[cron] = Math.round(vals.reduce((s, v) => s + v, 0) / vals.length)
-        }
-        return row
-      })
+    const rows = buildPingBuckets(node.tcpPings, cronNames).map(pt => {
+      const row: Record<string, string | number> = {
+        time: new Date(pt.t).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      }
+      for (const cron of cronNames) {
+        const v = pt[cron]
+        if (v != null) row[cron] = Math.round(v)
+      }
+      return row
+    })
 
     // 3 点移动平均，滤掉毛刺
     return rows.map((row, i) => {
