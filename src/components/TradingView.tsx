@@ -308,9 +308,9 @@ const Row = memo(function Row({ node, selected, dim, onSelect }: { node: Node; s
       <div
         className="flex items-center gap-1.5 pl-3 h-full min-w-0 sticky left-0 z-10"
         style={{
-          background: rowBg && rowBg !== 'transparent'
-            ? `linear-gradient(${rowBg}, ${rowBg}), hsl(var(--card))`
-            : 'hsl(var(--card))',
+          background: 'transparent',
+          backdropFilter: 'blur(40px)',
+          WebkitBackdropFilter: 'blur(40px)',
         }}
       >
         <span
@@ -419,7 +419,11 @@ export function WatchList({ nodes, selected, activeTag, activeRegion, onSelect }
       >
         <span
           className="pl-3 sticky left-0 z-10"
-          style={{ background: 'hsl(var(--secondary))' }}
+          style={{
+            background: 'transparent',
+            backdropFilter: 'blur(40px)',
+            WebkitBackdropFilter: 'blur(40px)',
+          }}
         >Symbol</span>
         <span className="text-right">CPU</span>
         <span className="text-right">Δ 5m</span>
