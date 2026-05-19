@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import type { Node } from '../types'
 import { deriveUsage, displayName } from '../utils/derive'
 
@@ -14,10 +14,8 @@ function fmtBps(bps: number): string {
 
 type Alert = { uuid: string; level: 'halt' | 'warn'; text: string }
 
-// 每次只显示 1 条，确保任意屏幕宽度都放得下
-const MAX_PER_PAGE = 1
-const INTERVAL_MS = 3500
-const TRANSITION_MS = 260
+const PX_PER_ALERT = 200
+const PX_PER_SEC = 60
 
 export function AlertBanner({ nodes, onSelect }: { nodes: Node[]; onSelect?: (uuid: string) => void }) {
   const alerts = useMemo<Alert[]>(() => {
@@ -50,61 +48,11 @@ export function AlertBanner({ nodes, onSelect }: { nodes: Node[]; onSelect?: (uu
     return list
   }, [nodes])
 
-  const totalPages = Math.ceil(alerts.length / MAX_PER_PAGE)
-  const isMultiPage = totalPages > 1
-
-  const [page, setPage] = useState(0)
-  const [phase, setPhase] = useState<'idle' | 'exit' | 'enter'>('idle')
-
-  // 多页时自动翻页（竖向过渡动画）
-  useEffect(() => {
-    if (!isMultiPage) return
-    let alive = true
-    const pending: ReturnType<typeof setTimeout>[] = []
-
-    const timer = setInterval(() => {
-      setPhase('exit')
-      const t1 = setTimeout(() => {
-        if (!alive) return
-        setPage(p => (p + 1) % totalPages)
-        setPhase('enter')
-        const t2 = setTimeout(() => {
-          if (!alive) return
-          setPhase('idle')
-        }, TRANSITION_MS)
-        pending.push(t2)
-      }, TRANSITION_MS)
-      pending.push(t1)
-    }, INTERVAL_MS)
-
-    return () => {
-      alive = false
-      clearInterval(timer)
-      pending.forEach(clearTimeout)
-    }
-  }, [isMultiPage, totalPages])
-
-  // alerts 变化时重置到第一页
-  useEffect(() => {
-    setPage(0)
-    setPhase('idle')
-  }, [alerts.length])
-
   if (alerts.length === 0) return null
 
   const halts = alerts.filter(a => a.level === 'halt').length
-  const safePage = Math.min(page, totalPages - 1)
-  const visible = alerts.slice(safePage * MAX_PER_PAGE, (safePage + 1) * MAX_PER_PAGE)
-
-  const rowStyle: React.CSSProperties = {
-    opacity: phase === 'exit' ? 0 : 1,
-    transform: phase === 'exit'
-      ? 'translateY(-5px)'
-      : phase === 'enter'
-        ? 'translateY(5px)'
-        : 'translateY(0)',
-    transition: `opacity ${TRANSITION_MS}ms ease, transform ${TRANSITION_MS}ms ease`,
-  }
+  const color = halts > 0 ? RED : YELLOW
+  const duration = Math.max(8, (alerts.length * PX_PER_ALERT) / PX_PER_SEC)
 
   return (
     <div
@@ -118,8 +66,8 @@ export function AlertBanner({ nodes, onSelect }: { nodes: Node[]; onSelect?: (uu
     >
       {/* 左侧徽章 */}
       <div
-        className="shrink-0 flex items-center gap-1.5 px-3 text-[9px] font-bold uppercase tracking-[0.2em] font-mono"
-        style={{ background: halts > 0 ? RED : YELLOW, color: '#000' }}
+        className="shrink-0 z-10 flex items-center gap-1.5 px-3 text-[9px] font-bold uppercase tracking-[0.2em] font-mono"
+        style={{ background: color, color: '#000' }}
       >
         <span
           className="inline-block w-1.5 h-1.5 rounded-full"
@@ -128,38 +76,35 @@ export function AlertBanner({ nodes, onSelect }: { nodes: Node[]; onSelect?: (uu
         {halts > 0 ? `HALT · ${halts}` : `WARN · ${alerts.length}`}
       </div>
 
-      {/* 当前条：竖向翻页动画 */}
-      <div
-        className="flex-1 min-w-0 flex items-center overflow-hidden"
-        style={rowStyle}
-      >
-        {visible.map((a) => (
-          <button
-            key={a.uuid}
-            type="button"
-            onClick={() => onSelect?.(a.uuid)}
-            className="shrink-0 flex items-center px-3 text-[10px] font-bold font-mono tracking-wide uppercase appearance-none bg-transparent border-0 m-0 cursor-pointer truncate"
-            style={{ color: a.level === 'halt' ? RED : YELLOW }}
-          >
-            ◆ {a.text}
-          </button>
-        ))}
-      </div>
-
-      {/* 右侧页码，仅多页时显示 */}
-      {isMultiPage && (
+      {/* 跑马灯：复制两份实现无缝循环 */}
+      <div className="flex-1 min-w-0 overflow-hidden flex items-center">
         <div
-          className="shrink-0 flex items-center px-3 text-[9px] font-mono tabular-nums"
-          style={{ color: halts > 0 ? RED : YELLOW, opacity: 0.6 }}
+          className="flex items-center whitespace-nowrap"
+          style={{ animation: `alert-marquee ${duration}s linear infinite` }}
         >
-          {safePage + 1}/{totalPages}
+          {[...alerts, ...alerts].map((a, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => onSelect?.(a.uuid)}
+              className="shrink-0 inline-flex items-center px-3 text-[10px] font-bold font-mono tracking-wide uppercase appearance-none bg-transparent border-0 m-0 cursor-pointer"
+              style={{ color: a.level === 'halt' ? RED : YELLOW }}
+            >
+              <span className="mr-2 opacity-30" style={{ color }}>·</span>
+              ◆ {a.text}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
 
       <style>{`
         @keyframes alert-pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.3; }
+        }
+        @keyframes alert-marquee {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
       `}</style>
     </div>
