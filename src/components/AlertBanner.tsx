@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useRef, useLayoutEffect } from 'react'
 import type { Node } from '../types'
 import { deriveUsage, displayName } from '../utils/derive'
 
@@ -14,10 +14,12 @@ function fmtBps(bps: number): string {
 
 type Alert = { uuid: string; level: 'halt' | 'warn'; text: string }
 
-const PX_PER_ALERT = 200
 const PX_PER_SEC = 60
 
 export function AlertBanner({ nodes, onSelect }: { nodes: Node[]; onSelect?: (uuid: string) => void }) {
+  const stripRef = useRef<HTMLDivElement>(null)
+  const animRef = useRef<Animation | null>(null)
+
   const alerts = useMemo<Alert[]>(() => {
     const list: Alert[] = []
     for (const n of nodes) {
@@ -48,11 +50,34 @@ export function AlertBanner({ nodes, onSelect }: { nodes: Node[]; onSelect?: (uu
     return list
   }, [nodes])
 
+  // 用实测像素宽度驱动动画，避免 -50% 因文本变化而跳帧
+  useLayoutEffect(() => {
+    const el = stripRef.current
+    if (!el || !alerts.length) return
+    const onePass = el.scrollWidth / 2
+    const dur = Math.max(8000, (onePass / PX_PER_SEC) * 1000)
+    const kf: Keyframe[] = [
+      { transform: 'translateX(0px)' },
+      { transform: `translateX(-${onePass}px)` },
+    ]
+    if (animRef.current) {
+      // 保留当前进度，取消旧动画后立即以相同位置重启
+      const oldDur = (animRef.current.effect?.getComputedTiming().duration as number) || dur
+      const startTime = ((animRef.current.currentTime as number) % oldDur) / oldDur * dur
+      animRef.current.cancel()
+      animRef.current = el.animate(kf, { duration: dur, iterations: Infinity, easing: 'linear' })
+      animRef.current.currentTime = startTime
+    } else {
+      animRef.current = el.animate(kf, { duration: dur, iterations: Infinity, easing: 'linear' })
+    }
+  }, [alerts])
+
+  useLayoutEffect(() => () => { animRef.current?.cancel() }, [])
+
   if (alerts.length === 0) return null
 
   const halts = alerts.filter(a => a.level === 'halt').length
   const color = halts > 0 ? RED : YELLOW
-  const duration = Math.max(8, (alerts.length * PX_PER_ALERT) / PX_PER_SEC)
 
   return (
     <div
@@ -76,11 +101,12 @@ export function AlertBanner({ nodes, onSelect }: { nodes: Node[]; onSelect?: (uu
         {halts > 0 ? `HALT · ${halts}` : `WARN · ${alerts.length}`}
       </div>
 
-      {/* 跑马灯：复制两份实现无缝循环 */}
+      {/* 跑马灯：复制两份实现无缝循环，动画由 Web Animations API 驱动 */}
       <div className="flex-1 min-w-0 overflow-hidden flex items-center">
         <div
+          ref={stripRef}
           className="flex items-center whitespace-nowrap"
-          style={{ animation: `alert-marquee ${duration}s linear infinite` }}
+          style={{ willChange: 'transform' }}
         >
           {[...alerts, ...alerts].map((a, i) => (
             <button
@@ -101,10 +127,6 @@ export function AlertBanner({ nodes, onSelect }: { nodes: Node[]; onSelect?: (uu
         @keyframes alert-pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.3; }
-        }
-        @keyframes alert-marquee {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
         }
       `}</style>
     </div>
