@@ -1,7 +1,7 @@
 {
-  "name": "NodeGet Basic Theme",
-  "short": "NodeGetBasic",
-  "description": "NodeGet Basic Theme - a boilerplate for custom themes",
+  "name": "NASDAQ Theme",
+  "short": "NASDAQ",
+  "description": "股票大盘交易风格的主题",
   "author": "NodeSeekDev",
   "repository": "https://github.com/NodeSeekDev/NodeGet-StatusShow",
   "dist_page": "https://nodeget.pages.dev",
