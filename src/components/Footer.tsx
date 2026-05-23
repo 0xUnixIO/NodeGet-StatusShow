@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { HardDriveDownload } from 'lucide-react'
 import type { Node } from '../types'
 
 const REPO = 'https://github.com/NodeSeekDev/NodeGet-StatusShow'
@@ -64,7 +65,17 @@ export function Footer({ text, nodes = [] }: { text?: string; nodes?: Node[] }) 
           <span className="tabular-nums">{fmtClock(now, true)}</span>
         </span>
 
-        <span className="ml-auto shrink-0" style={{ color: 'hsl(var(--nx-text-muted))' }}>
+        <span className="ml-auto flex items-center gap-3 shrink-0" style={{ color: 'hsl(var(--nx-text-muted))' }}>
+          <a
+            href="download.html"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1 transition-colors hover:text-[hsl(var(--nx-text-primary))]"
+            title="提取当前主题"
+          >
+            <HardDriveDownload className="w-3 h-3" />
+            <span className="hidden sm:inline">提取主题</span>
+          </a>
           <a
             href={REPO}
             target="_blank"
